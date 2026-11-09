@@ -1,297 +1,318 @@
 
-// ==========================================
-// LO-FI / CHILL INSTRUMENTAL FON MUSIQASI
-// Eski musicStart() va musicStop() kodlari
-// hamda musiqa tugmalari hodisalarini almashtiradi.
-// ==========================================
+<div id="lab9v2" class="w-full flex flex-col gap-3 text-base" style="color:var(--viz-text)">
+<style>
+#lab9v2{font-size:14px}#lab9v2 *{box-sizing:border-box}#lab9v2 button{cursor:pointer}
+#lab9v2 .hero{background:linear-gradient(125deg,#142b50,#31599a,#7551ae);color:white;padding:22px;border-radius:17px}
+#lab9v2 .nav{display:flex;gap:7px;overflow:auto;padding:3px 0 8px}
+#lab9v2 .tab{padding:10px 13px;border:1px solid var(--viz-border);border-radius:10px;background:var(--viz-card);color:var(--viz-text);white-space:nowrap;font-size:12px;font-weight:750}
+#lab9v2 .tab.active{background:#326bd2;color:white;border-color:#326bd2}
+#lab9v2 .panel{padding:15px;border:1px solid var(--viz-border);border-radius:14px;background:var(--viz-card)}
+#lab9v2 .tile{padding:13px;border:1px solid var(--viz-border);border-radius:12px;background:var(--viz-panel)}
+#lab9v2 .muted{color:var(--viz-muted)}
+#lab9v2 .eyebrow{font-size:10px;letter-spacing:1.3px;font-weight:800;color:var(--viz-muted)}
+#lab9v2 .action{background:#326bd2;color:white;padding:11px 15px;border:0;border-radius:10px;font-weight:750}
+#lab9v2 .secondary{background:var(--viz-panel);color:var(--viz-text);border:1px solid var(--viz-border);padding:10px 13px;border-radius:10px;font-weight:700}
+#lab9v2 input,#lab9v2 select{background:var(--viz-card);color:var(--viz-text);border:1px solid var(--viz-border);border-radius:9px;padding:11px;width:100%;min-width:0}
+#lab9v2 .choice{display:block;width:100%;text-align:left;margin-top:8px;padding:12px;border:1px solid var(--viz-border);border-radius:10px;background:var(--viz-card);color:var(--viz-text)}
+#lab9v2 .choice.correct{border:2px solid #159b75;background:rgba(21,155,117,.1)}
+#lab9v2 .choice.wrong{border:2px solid #d65d5d;background:rgba(214,93,93,.1)}
+#lab9v2 .feedback{padding:11px;background:var(--viz-panel);border-radius:10px;margin-top:10px}
+#lab9v2 .progress{height:6px;background:var(--viz-panel);border-radius:20px;overflow:hidden}
+#lab9v2 .progress div{height:100%;background:#4388ed}
+#lab9v2 .slide{min-height:290px;background:linear-gradient(140deg,#152b4b,#304879,#61458b);color:white;border-radius:15px;padding:25px;display:flex;flex-direction:column;justify-content:center}
+#lab9v2 .slide h2{font-size:clamp(25px,5vw,38px);font-weight:900;line-height:1.15;margin:14px 0}
+#lab9v2 .slide p{line-height:1.7;color:#e3eaff}
+#lab9v2 .hide{display:none!important}
+#lab9v2 table{width:100%;border-collapse:collapse;font-size:12px}
+#lab9v2 th,#lab9v2 td{text-align:left;padding:9px;border-bottom:1px solid var(--viz-border)}
+#lab9v2 th{background:var(--viz-panel)}
+#lab9v2 .tablewrap{overflow:auto}
+#lab9v2 .bigclock{font-size:55px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:2px}
+#lab9v2 .tag{display:inline-block;padding:4px 9px;border-radius:30px;background:var(--viz-panel);border:1px solid var(--viz-border);font-size:10px;font-weight:800}
+@media print{#lab9v2 .nav,#lab9v2 .hero,#lab9v2 .section:not(#results),#lab9v2 button{display:none!important}#lab9v2 #results{display:block!important}}
+</style>
 
-let audio = null;
-let master = null;
-let playing = false;
-let musicTimer = null;
-let musicStep = 0;
+<div class="hero">
+ <div class="text-xs tracking-widest font-bold opacity-75">INFORMATIKA • 9-SINF • IT LAB</div>
+ <div class="text-3xl font-black mt-3">COMMUNICATION<br>& DATA LAB</div>
+ <p class="mt-3 text-sm opacity-90">Kommunikatsiya dasturlari qamrovi. Ma’lumotlarni boshqarish dasturlari.</p>
+ <div class="flex gap-2 flex-wrap mt-4"><span class="tag">45 daqiqa</span><span class="tag">Interaktiv dars</span><span class="tag">Digital classroom</span></div>
+ <p class="text-xs mt-4 opacity-80">O‘qituvchi: O‘ktamova Maxliyo Odilovna</p>
+</div>
 
-const musicChords = [
-  [62, 66, 69, 73], // Dmaj7
-  [59, 62, 66, 69], // Bm7
-  [55, 59, 62, 66], // Gmaj7
-  [57, 61, 64, 69]  // A6
+<div class="nav">
+ <button class="tab active" data-tab="home">⌂ Bosh sahifa</button>
+ <button class="tab" data-tab="slides">▣ Slaydlar</button>
+ <button class="tab" data-tab="game">★ O‘yinlar</button>
+ <button class="tab" data-tab="lab">⌘ Amaliyot</button>
+ <button class="tab" data-tab="quiz">? Test</button>
+ <button class="tab" data-tab="results">🏆 Natijalar</button>
+ <button class="tab" data-tab="teacher">◷ O‘qituvchi</button>
+</div>
+
+<section id="home" class="section flex flex-col gap-3">
+ <div class="panel">
+  <div class="eyebrow">BUGUNGI MISSIYAMIZ</div>
+  <h2 class="text-2xl font-black mt-2">Raqamli dunyoni boshqarishni o‘rganamiz!</h2>
+  <p class="muted mt-2">Bugun siz IT mutaxassisi sifatida muloqot dasturlari, ma’lumotlar bazasi va raqamli texnologiyalar bilan ishlaysiz.</p>
+ </div>
+ <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+  <div class="tile"><div class="text-2xl">💬</div><b>Muloqot</b><p class="muted text-xs">Axborot almashish</p></div>
+  <div class="tile"><div class="text-2xl">🗄️</div><b>Ma’lumotlar</b><p class="muted text-xs">Saqlash va boshqarish</p></div>
+  <div class="tile"><div class="text-2xl">💻</div><b>Amaliyot</b><p class="muted text-xs">Jadval yaratish</p></div>
+ </div>
+ <div class="panel">
+  <b>Dars xaritasi</b>
+  <div class="space-y-2 mt-3 text-sm">
+   <div class="flex justify-between"><span>Motivatsiya</span><b>5 daqiqa</b></div>
+   <div class="flex justify-between"><span>Yangi mavzu</span><b>10 daqiqa</b></div>
+   <div class="flex justify-between"><span>Guruhlar ishi</span><b>8 daqiqa</b></div>
+   <div class="flex justify-between"><span>Amaliyot</span><b>12 daqiqa</b></div>
+   <div class="flex justify-between"><span>Test va yakun</span><b>10 daqiqa</b></div>
+  </div>
+ </div>
+ <button class="action w-full" data-go="slides">Darsni boshlash →</button>
+</section>
+
+<section id="slides" class="section hide flex flex-col gap-3">
+ <div class="flex justify-between"><b id="slidecount">1 / 9</b><span class="tag">TAQDIMOT</span></div>
+ <div class="progress"><div id="slideprogress" style="width:11%"></div></div>
+ <div class="slide">
+  <div class="text-5xl" id="sicon">🌐</div>
+  <div class="eyebrow mt-4" id="slabel" style="color:#c8d7ff">KIRISH</div>
+  <h2 id="stitle">Raqamli dunyo</h2>
+  <p id="sbody">Biz har kuni axborot almashamiz. Buning uchun qanday dasturlardan foydalanamiz?</p>
+  <div id="sbullets" class="mt-4 space-y-2"></div>
+ </div>
+ <div class="panel"><div class="eyebrow">O‘QITUVCHI SAVOLI</div><p id="squestion" class="font-bold mt-2">Qaysi dasturlar orqali muloqot qilasiz?</p></div>
+ <div class="flex gap-2"><button id="prevslide" class="secondary flex-1">← Oldingi</button><button id="nextslide" class="action flex-1">Keyingi →</button></div>
+</section>
+
+<section id="game" class="section hide flex flex-col gap-3">
+ <div class="panel"><div class="eyebrow">JAMOAVIY BELLASHUV</div><h2 class="text-xl font-black mt-2">🎯 Raqamli ekspertlar</h2><p class="muted mt-2">Jamoani tanlang, topshiriqni muhokama qiling va yechimingizni himoya qiling.</p></div>
+ <div class="grid grid-cols-3 gap-2">
+  <button class="tile text-left" data-team="0">🏫<b class="block mt-2">Aqlli maktab</b></button>
+  <button class="tile text-left" data-team="1">🛒<b class="block mt-2">Smart Market</b></button>
+  <button class="tile text-left" data-team="2">🏥<b class="block mt-2">Smart Clinic</b></button>
+ </div>
+ <div class="panel" id="teamdetail"><b>Jamoani tanlang!</b><p class="muted mt-2">Topshiriq shu yerda ochiladi.</p></div>
+ <div class="panel"><b>🏆 Jamoalar ballari</b><div id="teamscores" class="space-y-3 mt-3"></div></div>
+</section>
+
+<section id="lab" class="section hide flex flex-col gap-3">
+ <div class="panel">
+  <div class="eyebrow">AMALIY LABORATORIYA</div>
+  <h2 class="text-xl font-black mt-1">💻 Men – ma’lumotlar menejeriman!</h2>
+  <p class="muted mt-2">Vazifalarni bajaring. Sizga 5 daqiqa vaqt beriladi.</p>
+ </div>
+ <div class="panel text-center">
+  <div class="eyebrow">5 DAQIQALIK SHAXSIY TAYMER</div>
+  <div class="bigclock my-3" id="labclock">05:00</div>
+  <div class="progress"><div id="labprogress" style="width:100%"></div></div>
+  <div class="flex gap-2 justify-center mt-4 flex-wrap">
+   <button class="action" id="labstart">▶ Boshlash</button>
+   <button class="secondary" id="labpause">Ⅱ Pauza</button>
+   <button class="secondary" id="labreset">↺ Qayta</button>
+  </div>
+  <p class="text-xs muted mt-3" id="labtimertext">Taymerni ishni boshlaganingizda yoqing.</p>
+ </div>
+ <div class="panel">
+  <div class="flex items-center justify-between gap-2"><b>🎧 Ijodiy muhit</b><span class="tag">ORIGINAL AMBIENT</span></div>
+  <p class="text-sm muted mt-2">Ish jarayonida sokin elektron fon musiqasini yoqing. Musiqa ushbu platformada sintez qilinadi.</p>
+  <div class="flex gap-2 items-center mt-3">
+   <button class="action flex-1" id="musicbtn">♫ Musiqani yoqish</button>
+   <button class="secondary" id="musicmute">Ⅱ</button>
+  </div>
+  <label class="block text-xs muted mt-3">Ovoz balandligi</label>
+  <input id="volume" type="range" min="0" max="35" value="12" style="padding:0">
+  <p id="musicstatus" class="text-xs muted mt-2">Musiqa o‘chiq.</p>
+ </div>
+ <div class="panel">
+  <b>📊 O‘quvchilar jadvali</b>
+  <p class="text-xs muted mt-1">Ma’lumotlarni saralash, filtrlash va tahlil qilish.</p>
+  <input id="searchstudent" class="mt-3" placeholder="🔍 Ism bo‘yicha qidirish">
+  <select id="filterclass" class="mt-2"><option value="">Barcha sinflar</option><option>9-A</option><option>9-B</option></select>
+  <div class="tablewrap mt-3"><table><thead><tr><th>№</th><th>Ism</th><th>Sinf</th><th><button id="sortscore">Ball ↕</button></th></tr></thead><tbody id="studentrows"></tbody></table></div>
+  <div class="grid grid-cols-2 gap-2 mt-3"><div class="tile"><span class="muted text-xs">O‘quvchilar</span><div class="text-2xl font-black" id="countstudents">6</div></div><div class="tile"><span class="muted text-xs">O‘rtacha ball</span><div class="text-2xl font-black" id="avgscore">82.7</div></div></div>
+ </div>
+ <div class="panel">
+  <b>Topshiriqlar darajasi</b>
+  <div class="flex flex-wrap gap-2 mt-3"><button class="tab active" data-level="0">🟢 Boshlang‘ich</button><button class="tab" data-level="1">🔵 Izlanuvchi</button><button class="tab" data-level="2">🟣 IT mutaxassisi</button></div>
+  <div id="leveltask" class="feedback"></div>
+  <button class="action w-full mt-3" id="taskdone">✓ Topshiriqni bajardim</button>
+  <p id="taskfeedback" class="text-xs muted mt-2"></p>
+ </div>
+ <div class="panel">
+  <b>Yangi ma’lumot kiriting</b>
+  <div class="grid grid-cols-2 gap-2 mt-3"><input id="newname" placeholder="Ism"><select id="newclass"><option>9-A</option><option>9-B</option></select><input id="newscore" type="number" placeholder="Ball 0–100"><button id="addstudent" class="action">+ Qo‘shish</button></div>
+  <p id="addfeedback" class="text-xs muted mt-2"></p>
+ </div>
+</section>
+
+<section id="quiz" class="section hide flex flex-col gap-3">
+ <div class="panel">
+  <div class="eyebrow">SHAXSIY BILIMLAR BELLASHUVI</div>
+  <h2 class="text-xl font-black mt-2">🏆 Kim bilimdon?</h2>
+  <p class="muted mt-2">Testga kirish uchun ism-familiyangizni yozing.</p>
+  <div id="entry">
+   <label class="block font-bold text-sm mt-4 mb-2" for="studentname">Ism va familiya</label>
+   <input id="studentname" placeholder="Masalan: Ali Valiyev" autocomplete="name">
+   <p id="entryerror" class="text-xs mt-2" style="color:#db6969"></p>
+   <button class="action w-full mt-3" id="enterquiz">Testni boshlash →</button>
+  </div>
+  <div id="quizwelcome" class="hide feedback"><b id="welcomeName"></b><p class="text-xs muted mt-1">Omad tilaymiz! Barcha savollarga javob bering.</p></div>
+ </div>
+ <div id="quizarea" class="hide panel">
+  <div class="flex justify-between text-xs muted"><span id="quiznumber">Savol 1 / 8</span><b id="quizpoints">0 ball</b></div>
+  <div class="progress mt-2"><div id="quizprogress" style="width:0%"></div></div>
+  <div class="tag mt-4">TEST SAVOLI</div>
+  <h3 id="question" class="text-lg font-extrabold mt-3"></h3>
+  <div id="answers"></div>
+  <div id="quizfeedback" class="hide feedback"></div>
+  <button id="quiznext" class="action w-full mt-3 hide">Keyingi savol →</button>
+ </div>
+ <div id="quizresult" class="hide panel text-center">
+  <div class="text-5xl">🏅</div>
+  <div class="eyebrow mt-3">SIZNING TEST NATIJANGIZ</div>
+  <h2 id="finalname" class="text-xl font-black mt-2"></h2>
+  <div id="finalscore" class="text-4xl font-black mt-3">0 / 8</div>
+  <p id="finalpercent" class="text-lg font-bold mt-2"></p>
+  <div id="finalmessage" class="feedback mt-3"></div>
+  <button class="action w-full mt-3" id="saveResult">Natijani ro‘yxatga saqlash ✓</button>
+  <button class="secondary w-full mt-2" id="againquiz">Yana test ishlash</button>
+  <button class="secondary w-full mt-2" data-go="results">Barcha natijalarni ko‘rish →</button>
+ </div>
+</section>
+
+<section id="results" class="section hide flex flex-col gap-3">
+ <div class="panel">
+  <div class="eyebrow">O‘QITUVCHI UCHUN</div>
+  <h2 class="text-xl font-black mt-2">🏆 Test natijalari</h2>
+  <p class="muted mt-2">Testni tugatgan o‘quvchilar natijalari shu yerda ko‘rinadi.</p>
+  <div class="grid grid-cols-2 gap-2 mt-4">
+   <div class="tile"><span class="text-xs muted">Qatnashchilar</span><div class="text-3xl font-black" id="resultcount">0</div></div>
+   <div class="tile"><span class="text-xs muted">O‘rtacha natija</span><div class="text-3xl font-black" id="resultaverage">0%</div></div>
+  </div>
+ </div>
+ <div class="panel">
+  <div class="flex flex-wrap justify-between items-center gap-2"><b>O‘quvchilar reytingi</b><span class="tag">TEST HISOBOTI</span></div>
+  <div class="tablewrap mt-3"><table><thead><tr><th>№</th><th>O‘quvchi</th><th>Ball</th><th>%</th><th>Baho</th></tr></thead><tbody id="resultrows"><tr><td colspan="5">Hozircha natija yo‘q.</td></tr></tbody></table></div>
+  <div class="flex flex-wrap gap-2 mt-4">
+   <button class="action flex-1" id="printresults">⎙ Chop etish</button>
+   <button class="secondary flex-1" id="csvresults">↓ Excel uchun CSV</button>
+  </div>
+  <button class="secondary w-full mt-2" id="clearresults">Natijalar ro‘yxatini tozalash</button>
+  <p class="text-xs muted mt-3">Natijalar shu ochiq sahifa xotirasida saqlanadi. CSV faylni yuklab olib saqlab qo‘yish mumkin.</p>
+ </div>
+</section>
+
+<section id="teacher" class="section hide flex flex-col gap-3">
+ <div class="panel">
+  <div class="eyebrow">O‘QITUVCHI PANELI</div>
+  <h2 class="text-xl font-black mt-2">⏱ Dars vaqtini boshqarish</h2>
+  <div class="bigclock text-center my-4" id="clock">05:00</div>
+  <div class="flex gap-2"><button class="action flex-1" id="timerstart">▶ Boshlash</button><button class="secondary flex-1" id="timerpause">Ⅱ Pauza</button><button class="secondary" id="timerreset">↺</button></div>
+  <select id="timerselect" class="mt-3"><option value="2">Tashkiliy qism – 2 daqiqa</option><option value="5" selected>Motivatsiya – 5 daqiqa</option><option value="10">Yangi mavzu – 10 daqiqa</option><option value="8">Guruh ishi – 8 daqiqa</option><option value="12">Amaliyot – 12 daqiqa</option><option value="5">Test – 5 daqiqa</option><option value="3">Refleksiya – 3 daqiqa</option></select>
+ </div>
+ <div class="panel">
+  <b>Dars nazorat ro‘yxati</b>
+  <div class="space-y-3 mt-3" id="checklist">
+   <label class="flex gap-2"><input type="checkbox" style="width:auto"> Tashkiliy qism</label>
+   <label class="flex gap-2"><input type="checkbox" style="width:auto"> Motivatsiya</label>
+   <label class="flex gap-2"><input type="checkbox" style="width:auto"> Yangi mavzu</label>
+   <label class="flex gap-2"><input type="checkbox" style="width:auto"> Guruhlar ishi</label>
+   <label class="flex gap-2"><input type="checkbox" style="width:auto"> Amaliy mashg‘ulot</label>
+   <label class="flex gap-2"><input type="checkbox" style="width:auto"> Test</label>
+   <label class="flex gap-2"><input type="checkbox" style="width:auto"> Refleksiya</label>
+  </div>
+ </div>
+ <div class="panel"><b>Darsning asosiy xulosasi</b><div class="feedback">Kommunikatsiya dasturlari axborot almashish uchun, ma’lumotlarni boshqarish dasturlari esa ma’lumotlarni saqlash, izlash va tartibga solish uchun xizmat qiladi.</div></div>
+</section>
+<div class="text-center text-xs muted py-2">IT LAB • 9-SINF • DIGITAL EDUCATION</div>
+</div>
+
+<script>
+(()=>{
+const r=document.getElementById('lab9v2');if(r.dataset.ready)return;r.dataset.ready='1';
+const $=id=>r.querySelector('#'+id);
+const show=id=>{r.querySelectorAll('.section').forEach(x=>x.classList.toggle('hide',x.id!==id));r.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));};
+r.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>show(b.dataset.tab));
+r.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
+
+const slides=[
+['🌐','KIRISH','Raqamli dunyo','Biz har kuni axborot almashamiz. Buning uchun qanday dasturlardan foydalanamiz?',['Telegram','Gmail','Google Meet'],'Siz bugun qaysi kommunikatsiya dasturidan foydalandingiz?'],
+['💬','1-QISM','Kommunikatsiya dasturlari','Insonlar o‘rtasida axborot almashish, muloqot qilish va fayl yuborishga xizmat qiladigan dasturlar.',['Matnli muloqot','Audio va videoaloqa','Jamoaviy hamkorlik'],'Telegram va Gmail bir xil vazifani bajaradimi?'],
+['📨','ALOQA','Matnli va faylli muloqot','Xabarlar, rasmlar, videolar va hujjatlarni yuborish hamda qabul qilish.',['Telegram','WhatsApp','Gmail'],'Elektron pochta qachon qulayroq?'],
+['🎥','VIDEOALOQA','Masofaviy muloqot','Audio va video orqali boshqa joydagi insonlar bilan jonli muloqot qilish.',['Google Meet','Zoom','Microsoft Teams'],'Onlayn dars uchun qaysi dastur qulay?'],
+['🤝','HAMKORLIK','Birgalikda ishlash','Bir nechta foydalanuvchi bitta hujjat ustida ishlashi mumkin.',['Google Docs','Google Drive','Microsoft 365'],'Birgalikda tahrirlashning afzalligi nima?'],
+['🗄️','2-QISM','Ma’lumotlar bazasi','Ma’lumotlar bazasi – tartiblangan holda saqlanadigan ma’lumotlar to‘plami.',['Maydon – ustun','Yozuv – qator','Baza – ma’lumotlar to‘plami'],'Maktab o‘quvchilari haqida qanday ma’lumotlar saqlanadi?'],
+['💻','MBBT','Ma’lumotlarni boshqarish','MBBT bazani yaratish, ma’lumotlarni saqlash, izlash va o‘zgartirishga yordam beradi.',['Microsoft Access','MySQL','PostgreSQL','Oracle Database'],'Qaysi dastur MBBT hisoblanadi?'],
+['⚖️','TAQQOSLASH','Excel va Access farqi','Excel – elektron jadvallar va hisob-kitoblar uchun. Access – ma’lumotlar bazasini boshqarish tizimi.',['Excel: formulalar, jadvallar, tahlil','Access: jadvallar, so‘rovlar, shakllar','Google Sheets: onlayn jadvallar'],'Excel va Access bir xil dasturmi?'],
+['🚀','YAKUN','Siz IT mutaxassisisiz!','Bugun muloqot dasturlari, ma’lumotlar bazasi va ularni boshqarish imkoniyatlarini o‘rgandik.',['Muloqot qiling!','Ma’lumotni tartiblang!','Xavfsizlikni unutmang!'],'Bugungi eng muhim xulosangiz nima?']
 ];
-
-const noteFreq = n => 440 * Math.pow(2, (n - 69) / 12);
-
-function makeNoise() {
-  const buffer = audio.createBuffer(
-    1,
-    audio.sampleRate * 2,
-    audio.sampleRate
-  );
-
-  const data = buffer.getChannelData(0);
-
-  for (let i = 0; i < data.length; i++) {
-    data[i] = (Math.random() * 2 - 1) * 0.25;
-  }
-
-  return buffer;
-}
-
-function playTone(freq, start, duration, volume, type = "sine") {
-  const osc = audio.createOscillator();
-  const gain = audio.createGain();
-  const filter = audio.createBiquadFilter();
-
-  osc.type = type;
-  osc.frequency.setValueAtTime(freq, start);
-
-  filter.type = "lowpass";
-  filter.frequency.value = 1800;
-  filter.Q.value = 0.5;
-
-  gain.gain.setValueAtTime(0.001, start);
-  gain.gain.linearRampToValueAtTime(volume, start + 0.08);
-  gain.gain.exponentialRampToValueAtTime(
-    0.001,
-    start + duration
-  );
-
-  osc.connect(filter);
-  filter.connect(gain);
-  gain.connect(master);
-
-  osc.start(start);
-  osc.stop(start + duration + 0.05);
-}
-
-function playPiano(freq, start) {
-  const osc1 = audio.createOscillator();
-  const osc2 = audio.createOscillator();
-  const gain = audio.createGain();
-  const filter = audio.createBiquadFilter();
-
-  osc1.type = "triangle";
-  osc2.type = "sine";
-
-  osc1.frequency.value = freq;
-  osc2.frequency.value = freq * 2.002;
-
-  filter.type = "lowpass";
-  filter.frequency.value = 2400;
-
-  gain.gain.setValueAtTime(0.001, start);
-  gain.gain.linearRampToValueAtTime(0.12, start + 0.015);
-  gain.gain.exponentialRampToValueAtTime(0.001, start + 1.5);
-
-  osc1.connect(filter);
-  osc2.connect(filter);
-  filter.connect(gain);
-  gain.connect(master);
-
-  osc1.start(start);
-  osc2.start(start);
-  osc1.stop(start + 1.6);
-  osc2.stop(start + 1.6);
-}
-
-function playBass(freq, start) {
-  const osc = audio.createOscillator();
-  const gain = audio.createGain();
-
-  osc.type = "sine";
-  osc.frequency.value = freq;
-
-  gain.gain.setValueAtTime(0.001, start);
-  gain.gain.linearRampToValueAtTime(0.15, start + 0.04);
-  gain.gain.exponentialRampToValueAtTime(0.001, start + 1.1);
-
-  osc.connect(gain);
-  gain.connect(master);
-
-  osc.start(start);
-  osc.stop(start + 1.2);
-}
-
-function playKick(start) {
-  const osc = audio.createOscillator();
-  const gain = audio.createGain();
-
-  osc.type = "sine";
-  osc.frequency.setValueAtTime(100, start);
-  osc.frequency.exponentialRampToValueAtTime(42, start + 0.16);
-
-  gain.gain.setValueAtTime(0.12, start);
-  gain.gain.exponentialRampToValueAtTime(0.001, start + 0.22);
-
-  osc.connect(gain);
-  gain.connect(master);
-
-  osc.start(start);
-  osc.stop(start + 0.24);
-}
-
-function playSoftSnare(start) {
-  const noise = audio.createBufferSource();
-  const filter = audio.createBiquadFilter();
-  const gain = audio.createGain();
-
-  noise.buffer = makeNoise();
-
-  filter.type = "highpass";
-  filter.frequency.value = 1600;
-
-  gain.gain.setValueAtTime(0.035, start);
-  gain.gain.exponentialRampToValueAtTime(0.001, start + 0.13);
-
-  noise.connect(filter);
-  filter.connect(gain);
-  gain.connect(master);
-
-  noise.start(start);
-  noise.stop(start + 0.15);
-}
-
-function playMusicBar() {
-  if (!audio || !playing) return;
-
-  const now = audio.currentTime + 0.08;
-  const chord = musicChords[musicStep % musicChords.length];
-
-  // Mayin pianino akkordlari
-  chord.forEach((note, i) => {
-    playTone(noteFreq(note), now, 2.8, 0.025, "triangle");
-  });
-
-  // Pianino melodiyasi
-  const melody = [
-    chord[2] + 12,
-    chord[1] + 12,
-    chord[3] + 12,
-    chord[2] + 12
-  ];
-
-  melody.forEach((note, i) => {
-    playPiano(noteFreq(note), now + i * 0.48);
-  });
-
-  // Yumshoq bas
-  playBass(noteFreq(chord[0] - 12), now);
-  playBass(noteFreq(chord[0] - 12), now + 1.35);
-
-  // Juda sokin lo-fi ritm
-  playKick(now);
-  playSoftSnare(now + 0.9);
-  playKick(now + 1.8);
-  playSoftSnare(now + 2.7);
-
-  musicStep++;
-}
-
-function addVinylTexture() {
-  const noise = audio.createBufferSource();
-  const filter = audio.createBiquadFilter();
-  const gain = audio.createGain();
-
-  noise.buffer = makeNoise();
-  noise.loop = true;
-
-  filter.type = "lowpass";
-  filter.frequency.value = 650;
-
-  gain.gain.value = 0.008;
-
-  noise.connect(filter);
-  filter.connect(gain);
-  gain.connect(master);
-
-  noise.start();
-}
-
-async function musicStart() {
-  if (!audio) {
-    const AudioContextClass =
-      window.AudioContext || window.webkitAudioContext;
-
-    audio = new AudioContextClass();
-
-    master = audio.createGain();
-    master.gain.value = 0.35;
-
-    const compressor = audio.createDynamicsCompressor();
-    compressor.threshold.value = -24;
-    compressor.knee.value = 18;
-    compressor.ratio.value = 3;
-    compressor.attack.value = 0.01;
-    compressor.release.value = 0.25;
-
-    master.connect(compressor);
-    compressor.connect(audio.destination);
-
-    addVinylTexture();
-  }
-
-  await audio.resume();
-
-  playing = true;
-  musicStep = 0;
-
-  playMusicBar();
-
-  if (musicTimer) clearInterval(musicTimer);
-
-  musicTimer = setInterval(() => {
-    if (playing) playMusicBar();
-  }, 3000);
-
-  const btn = document.getElementById("musicbtn");
-  const status = document.getElementById("musicstatus");
-
-  if (btn) btn.textContent = "⏸ Musiqani to‘xtatish";
-  if (status) status.textContent = "Lo-fi / Chill instrumental 🎧";
-}
-
-function musicStop() {
-  playing = false;
-
-  if (musicTimer) {
-    clearInterval(musicTimer);
-    musicTimer = null;
-  }
-
-  if (audio && audio.state === "running") {
-    audio.suspend();
-  }
-
-  const btn = document.getElementById("musicbtn");
-  const status = document.getElementById("musicstatus");
-
-  if (btn) btn.textContent = "▶ Musiqani yoqish";
-  if (status) status.textContent = "Musiqa to‘xtatildi";
-}
-
-// Musiqani yoqish / to‘xtatish
-document.getElementById("musicbtn").onclick = () => {
-  if (playing) {
-    musicStop();
-  } else {
-    musicStart();
-  }
-};
-
-// Ovozsiz rejim
-document.getElementById("musicmute").onclick = () => {
-  if (!master) return;
-
-  const muted = master.gain.value > 0.001;
-
-  master.gain.value = muted ? 0 : 0.35;
-
-  document.getElementById("musicmute").textContent =
-    muted ? "🔇 Ovozsiz" : "🔊 Ovozli";
-};
-
-// Ovoz balandligini boshqarish
-document.getElementById("volume").oninput = (e) => {
-  if (master) {
-    master.gain.value = Number(e.target.value) / 100 * 0.35;
-  }
-};
+let si=0;
+function slide(){let s=slides[si];$('sicon').textContent=s[0];$('slabel').textContent=s[1];$('stitle').textContent=s[2];$('sbody').textContent=s[3];$('sbullets').innerHTML=s[4].map(x=>'<div>✦ '+x+'</div>').join('');$('squestion').textContent=s[5];$('slidecount').textContent=(si+1)+' / '+slides.length;$('slideprogress').style.width=((si+1)/slides.length*100)+'%';$('prevslide').disabled=si===0;$('nextslide').textContent=si===slides.length-1?'Boshiga qaytish ↺':'Keyingi →'}
+$('prevslide').onclick=()=>{si=Math.max(0,si-1);slide()};$('nextslide').onclick=()=>{si=(si+1)%slides.length;slide()};slide();
+
+const teams=[['Aqlli maktab','Maktabda o‘quvchilar, ota-onalar va o‘qituvchilar bilan tezkor aloqa o‘rnatish kerak.',['Telegram orqali xabar','Gmail orqali rasmiy xat','Google Meet orqali yig‘ilish'],'Qaysi uchta dastur mos va nima uchun?'],['Smart Market','5000 ta mahsulotning nomi, kodi, narxi va soni saqlanishi kerak.',['Mahsulot nomi','Mahsulot kodi','Narxi va miqdori','Ishlab chiqaruvchi'],'Qaysi maydonlar kerak va qaysi MBBT mos?'],['Smart Clinic','Bemorlar ma’lumotlarini tartibli va maxfiy saqlash zarur.',['Bemor ID','Ism-familiya','Qabul sanasi','Shifokor'],'Ma’lumotlar qanday himoyalanadi?']];
+let scores=[0,0,0];
+function scoreDraw(){$('teamscores').innerHTML=teams.map((t,i)=>`<div class="flex items-center gap-2"><span class="text-xs w-24">${t[0]}</span><b>${scores[i]}</b><button class="secondary" data-add="${i}">+1</button></div>`).join('');r.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{scores[+b.dataset.add]++;scoreDraw()})}
+r.querySelectorAll('[data-team]').forEach(b=>b.onclick=()=>{let i=+b.dataset.team,t=teams[i];$('teamdetail').innerHTML=`<div class="eyebrow">JAMOA ${i+1}</div><h3 class="text-xl font-black mt-2">${t[0]}</h3><p class="muted mt-2">${t[1]}</p><ul class="list-disc pl-5 mt-3 space-y-2">${t[2].map(x=>'<li>'+x+'</li>').join('')}</ul><div class="feedback"><b>Himoya savoli:</b><br>${t[3]}</div><button class="action w-full mt-3" id="award">Jamoaga 1 ball berish +</button>`;$('award').onclick=()=>{scores[i]++;scoreDraw();$('award').textContent='Ball berildi ✓';$('award').disabled=true}});scoreDraw();
+
+let students=[['Ali','9-A',85],['Vali','9-B',72],['Salima','9-A',95],['Madina','9-B',88],['Sardor','9-A',65],['Aziza','9-B',91]],desc=false;
+function drawTable(){let q=$('searchstudent').value.toLowerCase(),f=$('filterclass').value,a=students.filter(x=>x[0].toLowerCase().includes(q)&&(!f||x[1]===f));a.sort((x,y)=>desc?x[2]-y[2]:y[2]-x[2]);$('studentrows').innerHTML=a.map((x,i)=>`<tr><td>${i+1}</td><td>${x[0]}</td><td>${x[1]}</td><td>${x[2]}</td></tr>`).join('')||'<tr><td colspan="4">Ma’lumot yo‘q</td></tr>';$('countstudents').textContent=a.length;$('avgscore').textContent=a.length?(a.reduce((s,x)=>s+x[2],0)/a.length).toFixed(1):'—'}
+$('searchstudent').oninput=drawTable;$('filterclass').onchange=drawTable;$('sortscore').onclick=()=>{desc=!desc;drawTable()};
+$('addstudent').onclick=()=>{let n=$('newname').value.trim(),b=Number($('newscore').value);if(!n||$('newscore').value===''||!Number.isInteger(b)||b<0||b>100){$('addfeedback').textContent='Ism va 0–100 oralig‘ida butun ball kiriting.';return}students.push([n,$('newclass').value,b]);$('newname').value='';$('newscore').value='';$('addfeedback').textContent='Ma’lumot qo‘shildi!';drawTable()};drawTable();
+
+let lv=0;const tasks=[['Tayyor jadvalni ko‘rib chiqing. Ustun va qatorlarni aniqlang. Uchta kommunikatsiya dasturini yozing.','Maqsad: asosiy tushunchalar.'],['Jadvalni kamayish tartibida saralang. 9-A sinfni filtrlang. O‘rtacha ballni aniqlang.','Maqsad: saralash va filtrlash.'],['Davomat maydonini kiriting. Yangi ma’lumotlar bazasi loyihasini tuzing. Axborotni himoyalash yo‘lini tushuntiring.','Maqsad: mustaqil loyiha.']];
+function level(){r.querySelectorAll('[data-level]').forEach(b=>b.classList.toggle('active',+b.dataset.level===lv));$('leveltask').innerHTML='<b>'+['🟢 Boshlang‘ich','🔵 Izlanuvchi','🟣 IT mutaxassisi'][lv]+'</b><p class="mt-2">'+tasks[lv][0]+'</p><p class="muted text-xs mt-2">'+tasks[lv][1]+'</p>';$('taskfeedback').textContent=''}
+r.querySelectorAll('[data-level]').forEach(b=>b.onclick=()=>{lv=+b.dataset.level;level()});level();$('taskdone').onclick=()=>{$('taskfeedback').textContent='✓ Topshiriq bajarildi. Natijangizni o‘qituvchiga ko‘rsating.'};
+
+let left=300,labInt=null;
+function labClock(){$('labclock').textContent=String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0');$('labprogress').style.width=(left/300*100)+'%'}
+$('labstart').onclick=()=>{if(labInt)return;if(left<=0)left=300;$('labtimertext').textContent='⏳ Amaliy ish vaqti ketmoqda!';labInt=setInterval(()=>{left--;labClock();if(left<=0){clearInterval(labInt);labInt=null;$('labtimertext').textContent='⏰ 5 daqiqa tugadi! Ishingizni yakunlang.';beep()}},1000)};
+$('labpause').onclick=()=>{clearInterval(labInt);labInt=null;$('labtimertext').textContent='Taymer pauzada.'};
+$('labreset').onclick=()=>{clearInterval(labInt);labInt=null;left=300;labClock();$('labtimertext').textContent='Taymer qayta boshlandi.'};
+function beep(){try{let c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=660;g.gain.value=.07;o.start();o.stop(c.currentTime+.4);o.onended=()=>c.close()}catch(e){}}
+labClock();
+
+let audio=null,master=null,playing=false;
+function musicStart(){try{let AC=window.AudioContext||window.webkitAudioContext;if(!AC){$('musicstatus').textContent='Ushbu brauzerda audio qo‘llab-quvvatlanmaydi.';return}if(!audio){audio=new AC();master=audio.createGain();master.gain.value=Number($('volume').value)/100;master.connect(audio.destination);[130.81,164.81,196,261.63].forEach((freq,i)=>{let osc=audio.createOscillator(),gain=audio.createGain(),filter=audio.createBiquadFilter();osc.type='sine';osc.frequency.value=freq;gain.gain.value=[.19,.11,.09,.055][i];filter.type='lowpass';filter.frequency.value=450;osc.connect(filter);filter.connect(gain);gain.connect(master);osc.start()});let lfo=audio.createOscillator(),lg=audio.createGain();lfo.frequency.value=.12;lg.gain.value=.008;lfo.connect(lg);lg.connect(master.gain);lfo.start()}audio.resume();playing=true;$('musicbtn').textContent='Ⅱ Musiqani to‘xtatish';$('musicstatus').textContent='♫ Sokin original elektron ambient musiqa ijro etilmoqda.'}catch(e){$('musicstatus').textContent='Audio qurilmasi mavjud emas.'}}
+function musicStop(){if(audio)audio.suspend();playing=false;$('musicbtn').textContent='♫ Musiqani yoqish';$('musicstatus').textContent='Musiqa pauzada.'}
+$('musicbtn').onclick=()=>playing?musicStop():musicStart();
+$('musicmute').onclick=()=>{if(playing)musicStop();else musicStart()};
+$('volume').oninput=()=>{if(master&&audio)master.gain.setTargetAtTime(Number($('volume').value)/100,audio.currentTime,.1)};
+
+const qs=[
+['Kommunikatsiya dasturlarining asosiy vazifasi nima?',['Rasm chizish','Axborot almashish','Hisob-kitob','Operatsion tizim'],1,'Kommunikatsiya dasturlari muloqot uchun.'],
+['Qaysi biri videokonferensiya dasturi?',['Excel','Paint','Google Meet','Access'],2,'Google Meet videoaloqa uchun.'],
+['Gmail qanday dastur?',['Elektron pochta','MBBT','Grafik muharrir','Antivirus'],0,'Gmail elektron xat almashish uchun.'],
+['Ma’lumotlar bazasi nima?',['Qurilma','Tartiblangan ma’lumotlar to‘plami','Brauzer','O‘yin'],1,'Ma’lumotlar bazasi tartiblangan ma’lumotlar to‘plamidir.'],
+['Qaysi biri MBBT?',['Telegram','Paint','Microsoft Access','Google Meet'],2,'Access MBBT hisoblanadi.'],
+['Jadvaldagi ustun nima deyiladi?',['Yozuv','Maydon','Fayl','Papka'],1,'Maydon – ustun.'],
+['Ma’lumotlarni tartibda joylashtirish nima deyiladi?',['Saralash','Nusxalash','O‘chirish','Yuklash'],0,'Saralash ma’lumotlarni tartibga soladi.'],
+['Bir hujjatni birgalikda tahrirlash uchun qaysi vosita mos?',['Google Docs','Kalkulyator','Paint','Bloknot'],0,'Google Docs hamkorlikda tahrirlash imkonini beradi.']
+];
+let qi=0,points=0,locked=false,name='',results=[];
+function quizDraw(){let q=qs[qi];locked=false;$('quiznumber').textContent=`Savol ${qi+1} / ${qs.length}`;$('quizpoints').textContent=points+' ball';$('quizprogress').style.width=(qi/qs.length*100)+'%';$('question').textContent=q[0];$('quizfeedback').classList.add('hide');$('quiznext').classList.add('hide');$('answers').innerHTML=q[1].map((a,i)=>`<button class="choice" data-answer="${i}">${'ABCD'[i]}. ${a}</button>`).join('');r.querySelectorAll('[data-answer]').forEach(b=>b.onclick=()=>{if(locked)return;locked=true;let n=+b.dataset.answer,ok=n===q[2];if(ok)points++;r.querySelectorAll('[data-answer]').forEach(x=>{x.disabled=true;if(+x.dataset.answer===q[2])x.classList.add('correct');else if(x===b)x.classList.add('wrong')});$('quizpoints').textContent=points+' ball';$('quizfeedback').classList.remove('hide');$('quizfeedback').innerHTML=`<b>${ok?'✓ To‘g‘ri!':'✕ To‘g‘ri javob: '+q[1][q[2]]}</b><br>${q[3]}`;$('quiznext').classList.remove('hide');$('quiznext').textContent=qi===7?'Natijani ko‘rish':'Keyingi savol →'})}
+function startQuiz(){name=$('studentname').value.trim();if(name.length<3){$('entryerror').textContent='Iltimos, ism va familiyangizni kiriting.';return}$('entryerror').textContent='';$('entry').classList.add('hide');$('quizwelcome').classList.remove('hide');$('welcomeName').textContent='Omad, '+name+'!';$('quizarea').classList.remove('hide');$('quizresult').classList.add('hide');qi=0;points=0;quizDraw()}
+$('enterquiz').onclick=startQuiz;
+$('studentname').onkeydown=e=>{if(e.key==='Enter')startQuiz()};
+$('quiznext').onclick=()=>{qi++;if(qi===8){$('quizarea').classList.add('hide');$('quizresult').classList.remove('hide');let percent=Math.round(points/8*100),grade=points>=7?5:points>=5?4:points>=3?3:2;$('finalname').textContent=name;$('finalscore').textContent=points+' / 8';$('finalpercent').textContent=percent+'% • Baho: '+grade;$('finalmessage').textContent=points>=7?'Ajoyib! Siz haqiqiy IT bilimdonisiz!':points>=5?'Yaxshi natija! Yana biroz mashq qiling.':points>=3?'Yomon emas. Mavzuni yana takrorlang.':'Mavzuni qayta o‘rganib chiqing.';$('saveResult').textContent='Natijani ro‘yxatga saqlash ✓';$('saveResult').disabled=false}else quizDraw()};
+$('againquiz').onclick=()=>{ $('entry').classList.remove('hide');$('quizwelcome').classList.add('hide');$('quizresult').classList.add('hide');$('quizarea').classList.add('hide');$('studentname').value='';name='';};
+$('saveResult').onclick=()=>{if(results.some(x=>x.name.toLowerCase()===name.toLowerCase())){let old=results.find(x=>x.name.toLowerCase()===name.toLowerCase());old.score=points;old.percent=Math.round(points/8*100);old.grade=points>=7?5:points>=5?4:points>=3?3:2;}else results.push({name,score:points,percent:Math.round(points/8*100),grade:points>=7?5:points>=5?4:points>=3?3:2});$('saveResult').textContent='✓ Natija saqlandi';$('saveResult').disabled=true;resultsDraw()};
+function resultsDraw(){let n=results.length;$('resultcount').textContent=n;$('resultaverage').textContent=n?Math.round(results.reduce((s,x)=>s+x.percent,0)/n)+'%':'0%';$('resultrows').innerHTML=n?[...results].sort((a,b)=>b.score-a.score).map((x,i)=>`<tr><td>${i+1}</td><td><b>${escapeHTML(x.name)}</b></td><td>${x.score}/8</td><td>${x.percent}%</td><td>${x.grade}</td></tr>`).join(''):'<tr><td colspan="5">Hozircha natija yo‘q.</td></tr>'}
+function escapeHTML(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+$('printresults').onclick=()=>window.print();
+$('csvresults').onclick=()=>{let lines=[['№','O‘quvchi','Ball','Foiz','Baho'],...results.map((x,i)=>[i+1,x.name,x.score+'/8',x.percent+'%',x.grade])];let csv='\uFEFF'+lines.map(a=>a.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\r\n');let url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));let a=document.createElement('a');a.href=url;a.download='ITLAB_test_natijalari.csv';a.click();URL.revokeObjectURL(url)};
+$('clearresults').onclick=()=>{if(confirm('Barcha test natijalarini tozalashni xohlaysizmi?')){results=[];resultsDraw()}};
+resultsDraw();
+
+let sec=300,ti=null;
+function clock(){ $('clock').textContent=String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0')}
+$('timerselect').onchange=()=>{clearInterval(ti);ti=null;sec=+$('timerselect').value*60;clock()};
+$('timerstart').onclick=()=>{if(ti)return;ti=setInterval(()=>{sec--;clock();if(sec<=0){clearInterval(ti);ti=null;beep()}},1000)};
+$('timerpause').onclick=()=>{clearInterval(ti);ti=null};
+$('timerreset').onclick=()=>{clearInterval(ti);ti=null;sec=+$('timerselect').value*60;clock()};clock();
+})();
+</script>
