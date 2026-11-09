@@ -1,0 +1,297 @@
+
+// ==========================================
+// LO-FI / CHILL INSTRUMENTAL FON MUSIQASI
+// Eski musicStart() va musicStop() kodlari
+// hamda musiqa tugmalari hodisalarini almashtiradi.
+// ==========================================
+
+let audio = null;
+let master = null;
+let playing = false;
+let musicTimer = null;
+let musicStep = 0;
+
+const musicChords = [
+  [62, 66, 69, 73], // Dmaj7
+  [59, 62, 66, 69], // Bm7
+  [55, 59, 62, 66], // Gmaj7
+  [57, 61, 64, 69]  // A6
+];
+
+const noteFreq = n => 440 * Math.pow(2, (n - 69) / 12);
+
+function makeNoise() {
+  const buffer = audio.createBuffer(
+    1,
+    audio.sampleRate * 2,
+    audio.sampleRate
+  );
+
+  const data = buffer.getChannelData(0);
+
+  for (let i = 0; i < data.length; i++) {
+    data[i] = (Math.random() * 2 - 1) * 0.25;
+  }
+
+  return buffer;
+}
+
+function playTone(freq, start, duration, volume, type = "sine") {
+  const osc = audio.createOscillator();
+  const gain = audio.createGain();
+  const filter = audio.createBiquadFilter();
+
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, start);
+
+  filter.type = "lowpass";
+  filter.frequency.value = 1800;
+  filter.Q.value = 0.5;
+
+  gain.gain.setValueAtTime(0.001, start);
+  gain.gain.linearRampToValueAtTime(volume, start + 0.08);
+  gain.gain.exponentialRampToValueAtTime(
+    0.001,
+    start + duration
+  );
+
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(master);
+
+  osc.start(start);
+  osc.stop(start + duration + 0.05);
+}
+
+function playPiano(freq, start) {
+  const osc1 = audio.createOscillator();
+  const osc2 = audio.createOscillator();
+  const gain = audio.createGain();
+  const filter = audio.createBiquadFilter();
+
+  osc1.type = "triangle";
+  osc2.type = "sine";
+
+  osc1.frequency.value = freq;
+  osc2.frequency.value = freq * 2.002;
+
+  filter.type = "lowpass";
+  filter.frequency.value = 2400;
+
+  gain.gain.setValueAtTime(0.001, start);
+  gain.gain.linearRampToValueAtTime(0.12, start + 0.015);
+  gain.gain.exponentialRampToValueAtTime(0.001, start + 1.5);
+
+  osc1.connect(filter);
+  osc2.connect(filter);
+  filter.connect(gain);
+  gain.connect(master);
+
+  osc1.start(start);
+  osc2.start(start);
+  osc1.stop(start + 1.6);
+  osc2.stop(start + 1.6);
+}
+
+function playBass(freq, start) {
+  const osc = audio.createOscillator();
+  const gain = audio.createGain();
+
+  osc.type = "sine";
+  osc.frequency.value = freq;
+
+  gain.gain.setValueAtTime(0.001, start);
+  gain.gain.linearRampToValueAtTime(0.15, start + 0.04);
+  gain.gain.exponentialRampToValueAtTime(0.001, start + 1.1);
+
+  osc.connect(gain);
+  gain.connect(master);
+
+  osc.start(start);
+  osc.stop(start + 1.2);
+}
+
+function playKick(start) {
+  const osc = audio.createOscillator();
+  const gain = audio.createGain();
+
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(100, start);
+  osc.frequency.exponentialRampToValueAtTime(42, start + 0.16);
+
+  gain.gain.setValueAtTime(0.12, start);
+  gain.gain.exponentialRampToValueAtTime(0.001, start + 0.22);
+
+  osc.connect(gain);
+  gain.connect(master);
+
+  osc.start(start);
+  osc.stop(start + 0.24);
+}
+
+function playSoftSnare(start) {
+  const noise = audio.createBufferSource();
+  const filter = audio.createBiquadFilter();
+  const gain = audio.createGain();
+
+  noise.buffer = makeNoise();
+
+  filter.type = "highpass";
+  filter.frequency.value = 1600;
+
+  gain.gain.setValueAtTime(0.035, start);
+  gain.gain.exponentialRampToValueAtTime(0.001, start + 0.13);
+
+  noise.connect(filter);
+  filter.connect(gain);
+  gain.connect(master);
+
+  noise.start(start);
+  noise.stop(start + 0.15);
+}
+
+function playMusicBar() {
+  if (!audio || !playing) return;
+
+  const now = audio.currentTime + 0.08;
+  const chord = musicChords[musicStep % musicChords.length];
+
+  // Mayin pianino akkordlari
+  chord.forEach((note, i) => {
+    playTone(noteFreq(note), now, 2.8, 0.025, "triangle");
+  });
+
+  // Pianino melodiyasi
+  const melody = [
+    chord[2] + 12,
+    chord[1] + 12,
+    chord[3] + 12,
+    chord[2] + 12
+  ];
+
+  melody.forEach((note, i) => {
+    playPiano(noteFreq(note), now + i * 0.48);
+  });
+
+  // Yumshoq bas
+  playBass(noteFreq(chord[0] - 12), now);
+  playBass(noteFreq(chord[0] - 12), now + 1.35);
+
+  // Juda sokin lo-fi ritm
+  playKick(now);
+  playSoftSnare(now + 0.9);
+  playKick(now + 1.8);
+  playSoftSnare(now + 2.7);
+
+  musicStep++;
+}
+
+function addVinylTexture() {
+  const noise = audio.createBufferSource();
+  const filter = audio.createBiquadFilter();
+  const gain = audio.createGain();
+
+  noise.buffer = makeNoise();
+  noise.loop = true;
+
+  filter.type = "lowpass";
+  filter.frequency.value = 650;
+
+  gain.gain.value = 0.008;
+
+  noise.connect(filter);
+  filter.connect(gain);
+  gain.connect(master);
+
+  noise.start();
+}
+
+async function musicStart() {
+  if (!audio) {
+    const AudioContextClass =
+      window.AudioContext || window.webkitAudioContext;
+
+    audio = new AudioContextClass();
+
+    master = audio.createGain();
+    master.gain.value = 0.35;
+
+    const compressor = audio.createDynamicsCompressor();
+    compressor.threshold.value = -24;
+    compressor.knee.value = 18;
+    compressor.ratio.value = 3;
+    compressor.attack.value = 0.01;
+    compressor.release.value = 0.25;
+
+    master.connect(compressor);
+    compressor.connect(audio.destination);
+
+    addVinylTexture();
+  }
+
+  await audio.resume();
+
+  playing = true;
+  musicStep = 0;
+
+  playMusicBar();
+
+  if (musicTimer) clearInterval(musicTimer);
+
+  musicTimer = setInterval(() => {
+    if (playing) playMusicBar();
+  }, 3000);
+
+  const btn = document.getElementById("musicbtn");
+  const status = document.getElementById("musicstatus");
+
+  if (btn) btn.textContent = "⏸ Musiqani to‘xtatish";
+  if (status) status.textContent = "Lo-fi / Chill instrumental 🎧";
+}
+
+function musicStop() {
+  playing = false;
+
+  if (musicTimer) {
+    clearInterval(musicTimer);
+    musicTimer = null;
+  }
+
+  if (audio && audio.state === "running") {
+    audio.suspend();
+  }
+
+  const btn = document.getElementById("musicbtn");
+  const status = document.getElementById("musicstatus");
+
+  if (btn) btn.textContent = "▶ Musiqani yoqish";
+  if (status) status.textContent = "Musiqa to‘xtatildi";
+}
+
+// Musiqani yoqish / to‘xtatish
+document.getElementById("musicbtn").onclick = () => {
+  if (playing) {
+    musicStop();
+  } else {
+    musicStart();
+  }
+};
+
+// Ovozsiz rejim
+document.getElementById("musicmute").onclick = () => {
+  if (!master) return;
+
+  const muted = master.gain.value > 0.001;
+
+  master.gain.value = muted ? 0 : 0.35;
+
+  document.getElementById("musicmute").textContent =
+    muted ? "🔇 Ovozsiz" : "🔊 Ovozli";
+};
+
+// Ovoz balandligini boshqarish
+document.getElementById("volume").oninput = (e) => {
+  if (master) {
+    master.gain.value = Number(e.target.value) / 100 * 0.35;
+  }
+};
